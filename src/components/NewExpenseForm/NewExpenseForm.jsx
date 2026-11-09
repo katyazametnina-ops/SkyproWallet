@@ -54,7 +54,11 @@ export default function NewExpenseForm({ onAddExpense }) {
     setSelectedCategory("Еда");
   };
 
-  const isFormInvalid = !description.trim() || !date.trim() || !amount.trim();
+  const dateRegex = /^(0[1-9]|[12]\d|3[01])\.(0[1-9]|1[0-2])\.(\d{2}|\d{4})$/;
+
+  const isDateValid = dateRegex.test(date.trim());
+
+  const isFormInvalid = !description.trim() || !isDateValid || !amount.trim();
 
   return (
     <FormWrapper>
@@ -97,6 +101,7 @@ export default function NewExpenseForm({ onAddExpense }) {
             placeholder="Введите дату"
             value={date}
             onChange={(e) => setDate(e.target.value)}
+            $hasError={date.length > 0 && !isDateValid}
           />
         </FormGroup>
 

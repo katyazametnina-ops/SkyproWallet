@@ -36,7 +36,8 @@ export const Label = styled.label`
 export const Input = styled.input`
   width: 100%;
   padding: 12px;
-  border: 0.5px solid #999999;
+  border: 0.5px solid ${(props) => (props.$hasError ? "#F25050" : "#999999")};
+  background-color: ${(props) => (props.$hasError ? "#FFEBEB" : "#FFFFFF")};
   border-radius: 6px;
   font-family: inherit;
   font-size: 12px;
@@ -51,8 +52,8 @@ export const Input = styled.input`
   }
 
   &:focus {
-    border-color: #7334ea;
-    background-color: #f1ebfd;
+    border-color: ${(props) => (props.$hasError ? "#F25050" : "#7334ea")};
+    background-color: ${(props) => (props.$hasError ? "#FFEBEB" : "#f1ebfd")};
   }
 `;
 
