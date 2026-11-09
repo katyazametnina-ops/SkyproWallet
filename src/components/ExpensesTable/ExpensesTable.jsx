@@ -10,7 +10,7 @@ import {
 } from "./ExpensesTable.styled";
 import cartIcon from "../../assets/Cart.svg";
 
-export default function ExpensesTable({ expenses }) {
+export default function ExpensesTable({ expenses, onDelete }) {
   return (
     <TableWrapper>
       <TableHeader>
@@ -35,7 +35,11 @@ export default function ExpensesTable({ expenses }) {
               <Td>{item.date}</Td>
               <Td>{item.amount}</Td>
               <ActionTd>
-                <IconButton type="button" title="Удалить">
+                <IconButton
+                  type="button"
+                  title="Удалить"
+                  onClick={() => onDelete(item.id)}
+                >
                   <img src={cartIcon} alt="иконка корзины" />
                 </IconButton>
               </ActionTd>

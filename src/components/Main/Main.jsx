@@ -43,12 +43,17 @@ const mockExpenses = [
 
 export default function Main() {
   const [expenses, setExpenses] = useState(mockExpenses);
+
+  const handleDeleteExpense = (id) => {
+    setExpenses(expenses.filter((item) => item.id !== id));
+  };
+
   return (
     <StyledMain>
       <MainTitle>Мои расходы</MainTitle>
 
       <ContentWrapper>
-        <ExpensesTable expenses={expenses} />
+        <ExpensesTable expenses={expenses} onDelete={handleDeleteExpense} />
 
         <NewExpenseForm />
       </ContentWrapper>
