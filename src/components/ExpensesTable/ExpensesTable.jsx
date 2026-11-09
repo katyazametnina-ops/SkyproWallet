@@ -10,45 +10,7 @@ import {
 } from "./ExpensesTable.styled";
 import cartIcon from "../../assets/Cart.svg";
 
-const mockExpenses = [
-  {
-    id: 1,
-    description: "Пятерочка",
-    category: "Еда",
-    date: "03.07.2024",
-    amount: "3 500 ₽",
-  },
-  {
-    id: 2,
-    description: "Яндекс Такси",
-    category: "Транспорт",
-    date: "03.07.2024",
-    amount: "730 ₽",
-  },
-  {
-    id: 3,
-    description: "Аптека Вита",
-    category: "Здоровье",
-    date: "03.07.2024",
-    amount: "1 200 ₽",
-  },
-  {
-    id: 4,
-    description: "Бургер Кинг",
-    category: "Фастфуд",
-    date: "03.07.2024",
-    amount: "950 ₽",
-  },
-  {
-    id: 5,
-    description: "Делимобиль",
-    category: "Авто",
-    date: "02.07.2024",
-    amount: "1 320 ₽",
-  },
-];
-
-export default function ExpensesTable() {
+export default function ExpensesTable({ expenses }) {
   return (
     <TableWrapper>
       <TableHeader>
@@ -66,7 +28,7 @@ export default function ExpensesTable() {
           </tr>
         </thead>
         <tbody>
-          {mockExpenses.map((item) => (
+          {expenses.map((item) => (
             <tr key={item.id}>
               <Td>{item.description}</Td>
               <Td>{item.category}</Td>
