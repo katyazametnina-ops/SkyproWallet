@@ -48,6 +48,10 @@ export default function Main() {
     setExpenses(expenses.filter((item) => item.id !== id));
   };
 
+  const handleAddExpense = (newExpense) => {
+    setExpenses([...expenses, newExpense]);
+  };
+
   return (
     <StyledMain>
       <MainTitle>Мои расходы</MainTitle>
@@ -55,7 +59,7 @@ export default function Main() {
       <ContentWrapper>
         <ExpensesTable expenses={expenses} onDelete={handleDeleteExpense} />
 
-        <NewExpenseForm />
+        <NewExpenseForm onAddExpense={handleAddExpense} />
       </ContentWrapper>
     </StyledMain>
   );

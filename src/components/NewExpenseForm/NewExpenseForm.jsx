@@ -26,17 +26,48 @@ const categories = [
   { name: "Другое", icon: otherIcon },
 ];
 
-export default function NewExpenseForm() {
+export default function NewExpenseForm({ onAddExpense }) {
   const [selectedCategory, setSelectedCategory] = useState("Еда");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!description.trim() || !date.trim() || !amount.trim()) {
+      return;
+    }
+
+    const newExpense = {
+      id: Date.now(),
+      description: description,
+      category: selectedCategory,
+      date: date,
+      amount: `${amount} ₽`,
+    };
+
+    onAddExpense(newExpense);
+    setDescription("");
+    setDate("");
+    setAmount("");
+    setSelectedCategory("Еда");
+  };
 
   return (
     <FormWrapper>
       <FormTitle>Новый расход</FormTitle>
 
-      <Form onSubmit={(e) => e.preventDefault()}>
+      <Form onSubmit={handleSubmit}>
         <FormGroup>
           <Label htmlFor="description">Описание</Label>
-          <Input id="description" type="text" placeholder="Введите описание" />
+          <Input
+            id="description"
+            type="text"
+            placeholder="Введите описание"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </FormGroup>
 
         <FormGroup>
@@ -58,12 +89,24 @@ export default function NewExpenseForm() {
 
         <FormGroup>
           <Label htmlFor="date">Дата</Label>
-          <Input id="date" type="text" placeholder="Введите дату" />
+          <Input
+            id="date"
+            type="text"
+            placeholder="Введите дату"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
         </FormGroup>
 
         <FormGroup>
           <Label htmlFor="amount">Сумма</Label>
-          <Input id="amount" type="number" placeholder="Введите сумму" />
+          <Input
+            id="amount"
+            type="number"
+            placeholder="Введите сумму"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
         </FormGroup>
 
         <SubmitButton type="submit">Добавить новый расход</SubmitButton>
