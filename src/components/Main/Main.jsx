@@ -1,11 +1,6 @@
-import {
-  StyledMain,
-  MainTitle,
-  ContentWrapper,
-  FormCard,
-  CardTitle,
-} from "./Main.styled";
+import { StyledMain, MainTitle, ContentWrapper } from "./Main.styled";
 import ExpensesTable from ".././ExpensesTable/ExpensesTable";
+import NewExpenseForm from "../NewExpenseForm/NewExpenseForm";
 
 export default function Main() {
   return (
@@ -15,9 +10,7 @@ export default function Main() {
       <ContentWrapper>
         <ExpensesTable />
 
-        <FormCard>
-          <CardTitle>Новый расход</CardTitle>
-        </FormCard>
+        <NewExpenseForm />
       </ContentWrapper>
     </StyledMain>
   );
