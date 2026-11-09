@@ -2,10 +2,10 @@ import {
   StyledMain,
   MainTitle,
   ContentWrapper,
-  TableCard,
   FormCard,
   CardTitle,
 } from "./Main.styled";
+import ExpensesTable from ".././ExpensesTable/ExpensesTable";
 
 export default function Main() {
   return (
@@ -13,12 +13,8 @@ export default function Main() {
       <MainTitle>Мои расходы</MainTitle>
 
       <ContentWrapper>
-        {/* Левая карточка */}
-        <TableCard>
-          <CardTitle>Таблица расходов</CardTitle>
-        </TableCard>
+        <ExpensesTable />
 
-        {/* Правая карточка */}
         <FormCard>
           <CardTitle>Новый расход</CardTitle>
         </FormCard>
