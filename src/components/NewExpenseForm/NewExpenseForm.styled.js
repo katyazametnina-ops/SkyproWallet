@@ -105,4 +105,9 @@ export const SubmitButton = styled.button`
   &:hover {
     background-color: #5e22d0;
   }
+
+  &:disabled {
+    background-color: #999999;
+    cursor: not-allowed;
+  }
 `;

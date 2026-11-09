@@ -54,6 +54,8 @@ export default function NewExpenseForm({ onAddExpense }) {
     setSelectedCategory("Еда");
   };
 
+  const isFormInvalid = !description.trim() || !date.trim() || !amount.trim();
+
   return (
     <FormWrapper>
       <FormTitle>Новый расход</FormTitle>
@@ -109,7 +111,9 @@ export default function NewExpenseForm({ onAddExpense }) {
           />
         </FormGroup>
 
-        <SubmitButton type="submit">Добавить новый расход</SubmitButton>
+        <SubmitButton type="submit" disabled={isFormInvalid}>
+          Добавить новый расход
+        </SubmitButton>
       </Form>
     </FormWrapper>
   );
