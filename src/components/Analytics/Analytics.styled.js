@@ -54,7 +54,7 @@ export const MonthsScrollBox = styled.div`
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px 25px 24px 32px;
+  padding: 24px 0 24px 32px;
 
   &::-webkit-scrollbar {
     width: 6px;
