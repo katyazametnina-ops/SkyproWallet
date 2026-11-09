@@ -44,7 +44,7 @@ export default function NewExpenseForm({ onAddExpense }) {
       description: description,
       category: selectedCategory,
       date: date,
-      amount: `${amount} ₽`,
+      amount: `${Number(amount).toLocaleString("ru-RU")} ₽`,
     };
 
     onAddExpense(newExpense);
@@ -58,7 +58,9 @@ export default function NewExpenseForm({ onAddExpense }) {
 
   const isDateValid = dateRegex.test(date.trim());
 
-  const isFormInvalid = !description.trim() || !isDateValid || !amount.trim();
+  const isAmountValid = amount.trim() !== "" && Number(amount) > 0;
+
+  const isFormInvalid = !description.trim() || !isDateValid || !isAmountValid;
 
   return (
     <FormWrapper>
@@ -113,7 +115,12 @@ export default function NewExpenseForm({ onAddExpense }) {
             type="number"
             placeholder="Введите сумму"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 9) {
+                setAmount(e.target.value);
+              }
+            }}
+            $hasError={amount.length > 0 && !isAmountValid}
           />
         </FormGroup>
 
