@@ -71,6 +71,7 @@ export default function NewExpenseForm({ onAddExpense }) {
             id="description"
             type="text"
             placeholder="Введите описание"
+            maxLength={25}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />

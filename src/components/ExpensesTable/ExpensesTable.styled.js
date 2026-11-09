@@ -67,6 +67,8 @@ export const Td = styled.td`
   font-weight: 400;
   color: #000000;
   padding: 14px 0 0;
+  max-width: 150px;
+  word-break: break-word;
 `;
 
 export const ActionTd = styled(Td)`
