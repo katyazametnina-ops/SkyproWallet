@@ -27,18 +27,13 @@ const weekDays = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 const julyDays = Array.from({ length: 31 }, (_, i) => i + 1);
 const augustDays = Array.from({ length: 31 }, (_, i) => i + 1);
 
-const chartData = [
-  { label: "Еда", amount: "3 590 ₽", height: "328px", color: "#D9B6FF" },
-  { label: "Транспорт", amount: "1 835 ₽", height: "169px", color: "#FFB53D" },
-  { label: "Жилье", amount: "0 ₽", height: "4px", color: "#6EE4FE" },
-  {
-    label: "Развлечения",
-    amount: "1 250 ₽",
-    height: "109px",
-    color: "#B0AEFF",
-  },
-  { label: "Образование", amount: "600 ₽", height: "65px", color: "#BCEC30" },
-  { label: "Другое", amount: "2 306 ₽", height: "212px", color: "#FFB9B8" },
+const categoriesConfig = [
+  { key: "food", label: "Еда", color: "#D9B6FF" },
+  { key: "transport", label: "Транспорт", color: "#FFB53D" },
+  { key: "housing", label: "Жилье", color: "#6EE4FE" },
+  { key: "joy", label: "Развлечения", color: "#B0AEFF" },
+  { key: "education", label: "Образование", color: "#BCEC30" },
+  { key: "others", label: "Другое", color: "#FFB9B8" },
 ];
 
 export default function Analytics({ token }) {
@@ -60,6 +55,37 @@ export default function Analytics({ token }) {
     startDay === endDay
       ? `${startDay} июля 2024`
       : `период с ${startDay} по ${endDay} июля 2024`;
+
+  useEffect(() => {
+    if (!token) return;
+
+    const start = `7-${startDay}-2024`;
+    const end = `7-${endDay}-2024`;
+
+    getPeriodTransactions(token, { start, end })
+      .then((data) => setTransactions(data))
+      .catch((err) => console.error(err));
+  }, [token, startDay, endDay]);
+
+  const totalSum = transactions.reduce((acc, item) => acc + item.sum, 0);
+
+  const chartData = categoriesConfig.map((cat) => {
+    const categorySum = transactions
+      .filter((item) => item.category === cat.key)
+      .reduce((acc, item) => acc + item.sum, 0);
+
+    const heightPx =
+      totalSum > 0
+        ? Math.max(Math.round((categorySum / totalSum) * 328), 4)
+        : 4;
+
+    return {
+      label: cat.label,
+      amount: `${categorySum.toLocaleString("ru-RU")} ₽`,
+      height: `${heightPx}px`,
+      color: cat.color,
+    };
+  });
 
   return (
     <AnalyticsMain>
@@ -92,6 +118,9 @@ export default function Analytics({ token }) {
 
             <MonthTitle>Август 2024</MonthTitle>
             <DaysGrid>
+              <span />
+              <span />
+              <span />
               {augustDays.map((day) => (
                 <DayCircle key={`aug-${day}`} type="button">
                   {day}
@@ -103,7 +132,7 @@ export default function Analytics({ token }) {
 
         <ChartCard>
           <TotalHeader>
-            <TotalAmount>9 581 ₽</TotalAmount>
+            <TotalAmount>{totalSum.toLocaleString("ru-RU")} ₽</TotalAmount>
             <PeriodSubtitle>
               Расходы за <span>{periodText}</span>
             </PeriodSubtitle>
