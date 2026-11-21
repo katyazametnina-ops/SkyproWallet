@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPeriodTransactions } from "../../api";
 import {
   AnalyticsMain,
   AnalyticsTitle,
@@ -40,25 +41,25 @@ const chartData = [
   { label: "Другое", amount: "2 306 ₽", height: "212px", color: "#FFB9B8" },
 ];
 
-export default function Analytics() {
-  const [selectedDays, setSelectedDays] = useState([
-    10, 11, 12, 13, 14, 15, 16,
-  ]);
+export default function Analytics({ token }) {
+  const [startDay, setStartDay] = useState(10);
+  const [endDay, setEndDay] = useState(10);
 
-  const toggleDay = (day) => {
-    if (selectedDays.includes(day)) {
-      if (selectedDays.length > 1) {
-        setSelectedDays(selectedDays.filter((d) => d !== day));
-      }
+  const [transactions, setTransactions] = useState([]);
+
+  const handleDayClick = (day) => {
+    if (startDay === endDay && day > startDay) {
+      setEndDay(day);
     } else {
-      setSelectedDays([...selectedDays, day].sort((a, b) => a - b));
+      setStartDay(day);
+      setEndDay(day);
     }
   };
 
   const periodText =
-    selectedDays.length === 1
-      ? `${selectedDays[0]} июля 2024`
-      : `период с ${selectedDays[0]} по ${selectedDays[selectedDays.length - 1]} июля 2024`;
+    startDay === endDay
+      ? `${startDay} июля 2024`
+      : `период с ${startDay} по ${endDay} июля 2024`;
 
   return (
     <AnalyticsMain>
@@ -81,8 +82,8 @@ export default function Analytics() {
                 <DayCircle
                   key={`july-${day}`}
                   type="button"
-                  $isSelected={selectedDays.includes(day)}
-                  onClick={() => toggleDay(day)}
+                  $isSelected={day >= startDay && day <= endDay}
+                  onClick={() => handleDayClick(day)}
                 >
                   {day}
                 </DayCircle>
