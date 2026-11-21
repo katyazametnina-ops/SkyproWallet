@@ -1,7 +1,7 @@
 import logoImg from "../../assets/logo-black.svg";
 import { StyledHeader, Logo, Nav, HeaderLink } from "./Header.styled";
 
-export default function Header({ currentPage, onNavigate }) {
+export default function Header({ currentPage, onNavigate, onLogout }) {
   const isAuthPage = currentPage === "login" || currentPage === "register";
 
   return (
@@ -28,11 +28,7 @@ export default function Header({ currentPage, onNavigate }) {
             </HeaderLink>
           </Nav>
 
-          <HeaderLink
-            href="#"
-            data-text="Выйти"
-            onClick={() => onNavigate("login")}
-          >
+          <HeaderLink href="#" data-text="Выйти" onClick={onLogout}>
             Выйти
           </HeaderLink>
         </>
