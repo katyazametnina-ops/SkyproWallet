@@ -6,16 +6,41 @@ import Register from "./components/Auth/Register";
 import Analytics from "./components/Analytics/Analytics";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState("expenses");
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  const [currentPage, setCurrentPage] = useState(token ? "expenses" : "login");
+
+  const handleAuthSuccess = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setCurrentPage("expenses");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setCurrentPage("login");
+  };
 
   return (
     <>
-      <Header currentPage={currentPage} onNavigate={setCurrentPage} />
+      <Header
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+        onLogout={handleLogout}
+      />
 
-      {currentPage === "expenses" && <Main />}
-      {currentPage === "analytics" && <Analytics />}
-      {currentPage === "login" && <Login onNavigate={setCurrentPage} />}
-      {currentPage === "register" && <Register onNavigate={setCurrentPage} />}
+      {currentPage === "expenses" && <Main token={token} />}
+      {currentPage === "analytics" && <Analytics token={token} />}
+      {currentPage === "login" && (
+        <Login onNavigate={setCurrentPage} onAuthSuccess={handleAuthSuccess} />
+      )}
+      {currentPage === "register" && (
+        <Register
+          onNavigate={setCurrentPage}
+          onAuthSuccess={handleAuthSuccess}
+        />
+      )}
     </>
   );
 }

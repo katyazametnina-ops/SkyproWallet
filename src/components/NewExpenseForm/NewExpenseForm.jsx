@@ -40,11 +40,10 @@ export default function NewExpenseForm({ onAddExpense }) {
     }
 
     const newExpense = {
-      id: Date.now(),
-      description: description,
+      description: description.trim(),
       category: selectedCategory,
-      date: date,
-      amount: `${Number(amount).toLocaleString("ru-RU")} ₽`,
+      date: date.trim(),
+      sum: Number(amount),
     };
 
     onAddExpense(newExpense);
@@ -60,7 +59,9 @@ export default function NewExpenseForm({ onAddExpense }) {
 
   const isAmountValid = amount.trim() !== "" && Number(amount) > 0;
 
-  const isFormInvalid = !description.trim() || !isDateValid || !isAmountValid;
+  const isDescriptionValid = description.trim().length >= 4;
+
+  const isFormInvalid = !isDescriptionValid || !isDateValid || !isAmountValid;
 
   return (
     <FormWrapper>
@@ -72,7 +73,7 @@ export default function NewExpenseForm({ onAddExpense }) {
           <Input
             id="description"
             type="text"
-            placeholder="Введите описание"
+            placeholder="Введите описание (от 4 символов)"
             maxLength={25}
             value={description}
             onChange={(e) => setDescription(e.target.value)}

@@ -1,17 +1,34 @@
+import { useState } from "react";
+import { loginUser } from "../../api";
 import {
-  AuthButton,
+  AuthWrapper,
   AuthCard,
-  AuthFooterText,
+  AuthTitle,
   AuthForm,
   AuthInput,
-  AuthTitle,
-  AuthWrapper,
+  AuthButton,
+  AuthFooterText,
 } from "./Auth.styled";
 
-export default function Login({ onNavigate }) {
-  const handleLogin = (e) => {
+export default function Login({ onNavigate, onAuthSuccess }) {
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    onNavigate("expenses");
+    setError("");
+
+    try {
+      const data = await loginUser({
+        login: login.trim(),
+        password: password.trim(),
+      });
+
+      onAuthSuccess(data.user.token);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -20,8 +37,30 @@ export default function Login({ onNavigate }) {
         <AuthTitle>Вход</AuthTitle>
 
         <AuthForm onSubmit={handleLogin}>
-          <AuthInput type="email" placeholder="Эл. почта" />
-          <AuthInput type="password" placeholder="Пароль" />
+          <AuthInput
+            type="text"
+            placeholder="Эл. почта"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+          />
+          <AuthInput
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          {error && (
+            <p
+              style={{
+                color: "#F25050",
+                fontSize: "12px",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </p>
+          )}
 
           <AuthButton type="submit">Войти</AuthButton>
         </AuthForm>

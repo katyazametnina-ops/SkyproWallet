@@ -1,16 +1,55 @@
-# React + Vite
+# Skypro.Wallet — приложение для учёта расходов
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Это учебный проект для отслеживания личных финансов, написанный на **React**. Мой первый проект, который я развернула и собрала полностью с нуля с помощью сборщика **Vite**.
 
-Currently, two official plugins are available:
+## Что было сделано в проекте:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**1. Вёрстка и структура компонентов**
 
-## React Compiler
+- Разбила интерфейс по макету из Figma на отдельные компоненты: шапка (`Header`), главный экран (`Main`), таблица расходов (`ExpensesTable`), форма добавления (`NewExpenseForm`), экран аналитики (`Analytics`) и формы входа/регистрации (`Auth`).
+- Подключила шрифт _Montserrat_ и стилизовала все блоки с помощью библиотеки `styled-components`.
+- В шапке сделала переключение между страницами и подсветку активной вкладки. На страницах входа и регистрации кнопки навигации в шапке скрываются.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**2. Страница «Мои расходы» и валидация формы**
 
-## Expanding the ESLint configuration
+- Сделала вывод списка расходов в таблицу и удаление строчки при нажатии на иконку корзины.
+- В форме «Новый расход» реализовала выбор категории по клику (кнопки с иконками).
+- Добавила проверки (валидацию) для полей ввода, чтобы не ломалась вёрстка и не отправлялись пустые данные:
+  - в описании нужно ввести от 4 до 25 символов;
+  - дата проверяется по формату `ДД.ММ.ГГ` или `ДД.ММ.ГГГГ`;
+  - сумма должна быть больше нуля (и не длиннее 9 цифр);
+  - если поле заполнено неправильно, оно подсвечивается красным, а кнопка «Добавить новый расход» остаётся неактивной (`disabled`), пока все поля не будут заполнены верно.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**3. Страница «Анализ расходов»**
+
+- Сверстала блок с календарём и столбчатой диаграммой по категориям.
+- В календаре можно выбрать как один день, так и период из нескольких дней (например, неделю). В зависимости от выбранных дат меняется подпись периода и пересчитываются столбцы графика.
+
+**4. Работа с сервером (API)**
+
+- В отдельном файле `api.js` написала функции для запросов к учебному серверу `wedev-api.sky.pro`.
+- Подключила регистрацию и авторизацию пользователей. Полученный от сервера токен сохраняется в `localStorage`, чтобы при перезагрузке страницы не приходилось входить заново.
+- Связала таблицу, форму и страницу аналитики с сервером: расходы загружаются из базы, добавляются и удаляются через API. Также сделала перевод названий категорий и дат из формата сервера в удобный вид для таблицы.
+
+---
+
+## Что использовалось в работе:
+
+- React (хуки `useState`, `useEffect`)
+- Vite
+- Styled Components
+- JavaScript (`fetch`, `async/await`, работа с массивами)
+
+---
+
+## Как запустить проект:
+
+1. Установить зависимости:
+   ```bash
+   npm install
+   ```
+2. Запустить локальный сервер:
+   ```bash
+   npm run dev
+   ```
+3. Открыть проект в браузере по ссылке из терминала (`http://localhost:5173/`).

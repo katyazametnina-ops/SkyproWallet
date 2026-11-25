@@ -23,6 +23,7 @@ export const CalendarCard = styled.div`
   width: 379px;
   height: 540px;
   background-color: #ffffff;
+  flex-shrink: 0;
   border-radius: 30px;
   padding: 32px 0 0 0;
   box-shadow: 0px 20px 67px -12px rgba(0, 0, 0, 0.13);

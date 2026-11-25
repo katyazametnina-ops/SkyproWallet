@@ -1,55 +1,58 @@
-import { StyledMain, MainTitle, ContentWrapper } from "./Main.styled";
-import ExpensesTable from ".././ExpensesTable/ExpensesTable";
+import { useState, useEffect } from "react";
+import ExpensesTable from "../ExpensesTable/ExpensesTable";
 import NewExpenseForm from "../NewExpenseForm/NewExpenseForm";
-import { useState } from "react";
+import {
+  getTransactions,
+  addTransaction,
+  deleteTransaction,
+  categoryFromApi,
+  formatDateFromApi,
+} from "../../api";
+import { StyledMain, MainTitle, ContentWrapper } from "./Main.styled";
 
-const mockExpenses = [
-  {
-    id: 1,
-    description: "Пятерочка",
-    category: "Еда",
-    date: "03.07.2024",
-    amount: "3 500 ₽",
-  },
-  {
-    id: 2,
-    description: "Яндекс Такси",
-    category: "Транспорт",
-    date: "03.07.2024",
-    amount: "730 ₽",
-  },
-  {
-    id: 3,
-    description: "Аптека Вита",
-    category: "Здоровье",
-    date: "03.07.2024",
-    amount: "1 200 ₽",
-  },
-  {
-    id: 4,
-    description: "Бургер Кинг",
-    category: "Фастфуд",
-    date: "03.07.2024",
-    amount: "950 ₽",
-  },
-  {
-    id: 5,
-    description: "Делимобиль",
-    category: "Авто",
-    date: "02.07.2024",
-    amount: "1 320 ₽",
-  },
-];
+export default function Main({ token }) {
+  const [expenses, setExpenses] = useState([]);
 
-export default function Main() {
-  const [expenses, setExpenses] = useState(mockExpenses);
+  const formatServerData = (serverData) => {
+    const list = Array.isArray(serverData)
+      ? serverData
+      : serverData.transactions || [];
 
-  const handleDeleteExpense = (id) => {
-    setExpenses(expenses.filter((item) => item.id !== id));
+    return list.map((item) => ({
+      id: item._id,
+      description: item.description,
+      category: categoryFromApi[item.category] || item.category,
+      date: formatDateFromApi(item.date),
+      amount: `${Number(item.sum).toLocaleString("ru-RU")} ₽`,
+    }));
   };
 
-  const handleAddExpense = (newExpense) => {
-    setExpenses([...expenses, newExpense]);
+  useEffect(() => {
+    if (!token) return;
+
+    getTransactions(token)
+      .then((data) => {
+        setExpenses(formatServerData(data));
+      })
+      .catch((err) => console.error(err));
+  }, [token]);
+
+  const handleDeleteExpense = async (id) => {
+    try {
+      const updatedList = await deleteTransaction(token, id);
+      setExpenses(formatServerData(updatedList));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddExpense = async (newExpense) => {
+    try {
+      const updatedList = await addTransaction(token, newExpense);
+      setExpenses(formatServerData(updatedList));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -58,7 +61,6 @@ export default function Main() {
 
       <ContentWrapper>
         <ExpensesTable expenses={expenses} onDelete={handleDeleteExpense} />
-
         <NewExpenseForm onAddExpense={handleAddExpense} />
       </ContentWrapper>
     </StyledMain>
