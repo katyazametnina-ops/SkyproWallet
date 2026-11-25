@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPeriodTransactions } from "../../api";
+import { getTransactions, getPeriodTransactions } from "../../api";
 import {
   AnalyticsMain,
   AnalyticsTitle,
@@ -24,8 +24,35 @@ import {
 
 const weekDays = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
 
-const julyDays = Array.from({ length: 31 }, (_, i) => i + 1);
-const augustDays = Array.from({ length: 31 }, (_, i) => i + 1);
+const monthNames = [
+  "Январь",
+  "Февраль",
+  "Март",
+  "Апрель",
+  "Май",
+  "Июнь",
+  "Июль",
+  "Август",
+  "Сентябрь",
+  "Октябрь",
+  "Ноябрь",
+  "Декабрь",
+];
+
+const monthNamesGenitive = [
+  "января",
+  "февраля",
+  "марта",
+  "апреля",
+  "мая",
+  "июня",
+  "июля",
+  "августа",
+  "сентября",
+  "октября",
+  "ноября",
+  "декабря",
+];
 
 const categoriesConfig = [
   { key: "food", label: "Еда", color: "#D9B6FF" },
@@ -36,36 +63,103 @@ const categoriesConfig = [
   { key: "others", label: "Другое", color: "#FFB9B8" },
 ];
 
+const MAX_MONTHS = 12;
+
 export default function Analytics({ token }) {
-  const [startDay, setStartDay] = useState(10);
-  const [endDay, setEndDay] = useState(10);
+  const [startDate, setStartDate] = useState(new Date(2024, 6, 10));
+  const [endDate, setEndDate] = useState(new Date(2024, 6, 10));
+
+  const [calendarMonths, setCalendarMonths] = useState([
+    { year: 2024, month: 6 },
+    { year: 2024, month: 7 },
+  ]);
 
   const [transactions, setTransactions] = useState([]);
-
-  const handleDayClick = (day) => {
-    if (startDay === endDay && day > startDay) {
-      setEndDay(day);
-    } else {
-      setStartDay(day);
-      setEndDay(day);
-    }
-  };
-
-  const periodText =
-    startDay === endDay
-      ? `${startDay} июля 2024`
-      : `период с ${startDay} по ${endDay} июля 2024`;
 
   useEffect(() => {
     if (!token) return;
 
-    const start = `7-${startDay}-2024`;
-    const end = `7-${endDay}-2024`;
+    getTransactions(token)
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data.transactions || [];
+        if (list.length === 0) return;
+
+        const timestamps = list.map((item) => new Date(item.date).getTime());
+        const minDate = new Date(Math.min(...timestamps));
+        const maxDate = new Date(Math.max(...timestamps));
+
+        const startMonth = new Date(
+          minDate.getFullYear(),
+          minDate.getMonth(),
+          1,
+        );
+        const endMonth = new Date(
+          maxDate.getFullYear(),
+          maxDate.getMonth() + 1,
+          1,
+        );
+
+        const generatedMonths = [];
+        const current = new Date(startMonth);
+
+        while (current <= endMonth) {
+          generatedMonths.push({
+            year: current.getFullYear(),
+            month: current.getMonth(),
+          });
+          current.setMonth(current.getMonth() + 1);
+        }
+
+        const limitedMonths = generatedMonths.slice(-MAX_MONTHS);
+        setCalendarMonths(limitedMonths);
+
+        const initialDay = new Date(
+          maxDate.getFullYear(),
+          maxDate.getMonth(),
+          maxDate.getDate(),
+        );
+        setStartDate(initialDay);
+        setEndDate(initialDay);
+      })
+      .catch((err) => console.error(err));
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const start = `${startDate.getMonth() + 1}-${startDate.getDate()}-${startDate.getFullYear()}`;
+    const end = `${endDate.getMonth() + 1}-${endDate.getDate()}-${endDate.getFullYear()}`;
 
     getPeriodTransactions(token, { start, end })
-      .then((data) => setTransactions(data))
+      .then((data) => {
+        const list = Array.isArray(data) ? data : data.transactions || [];
+        setTransactions(list);
+      })
       .catch((err) => console.error(err));
-  }, [token, startDay, endDay]);
+  }, [token, startDate, endDate]);
+
+  const handleDayClick = (year, month, day) => {
+    const clickedDate = new Date(year, month, day);
+
+    if (
+      startDate.getTime() === endDate.getTime() &&
+      clickedDate.getTime() > startDate.getTime()
+    ) {
+      setEndDate(clickedDate);
+    } else {
+      setStartDate(clickedDate);
+      setEndDate(clickedDate);
+    }
+  };
+
+  const formatReadableDate = (date) => {
+    return `${date.getDate()} ${monthNamesGenitive[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
+  const periodText =
+    startDate.getTime() === endDate.getTime()
+      ? formatReadableDate(startDate)
+      : `период с ${formatReadableDate(startDate)} по ${formatReadableDate(endDate)}`;
 
   const totalSum = transactions.reduce((acc, item) => acc + item.sum, 0);
 
@@ -102,31 +196,48 @@ export default function Analytics({ token }) {
           </WeekDaysGrid>
 
           <MonthsScrollBox>
-            <MonthTitle>Июль 2024</MonthTitle>
-            <DaysGrid>
-              {julyDays.map((day) => (
-                <DayCircle
-                  key={`july-${day}`}
-                  type="button"
-                  $isSelected={day >= startDay && day <= endDay}
-                  onClick={() => handleDayClick(day)}
-                >
-                  {day}
-                </DayCircle>
-              ))}
-            </DaysGrid>
+            {calendarMonths.map(({ year, month }) => {
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const daysArray = Array.from(
+                { length: daysInMonth },
+                (_, i) => i + 1,
+              );
+              const firstDayOfWeek = new Date(year, month, 1).getDay();
+              const emptyCellsCount = (firstDayOfWeek + 6) % 7;
+              const emptyCells = Array.from({ length: emptyCellsCount });
 
-            <MonthTitle>Август 2024</MonthTitle>
-            <DaysGrid>
-              <span />
-              <span />
-              <span />
-              {augustDays.map((day) => (
-                <DayCircle key={`aug-${day}`} type="button">
-                  {day}
-                </DayCircle>
-              ))}
-            </DaysGrid>
+              return (
+                <div key={`${year}-${month}`}>
+                  <MonthTitle>
+                    {monthNames[month]} {year}
+                  </MonthTitle>
+
+                  <DaysGrid>
+                    {emptyCells.map((_, index) => (
+                      <span key={`empty-${index}`} />
+                    ))}
+
+                    {daysArray.map((day) => {
+                      const currentDate = new Date(year, month, day);
+                      const isSelected =
+                        currentDate.getTime() >= startDate.getTime() &&
+                        currentDate.getTime() <= endDate.getTime();
+
+                      return (
+                        <DayCircle
+                          key={`${year}-${month}-${day}`}
+                          type="button"
+                          $isSelected={isSelected}
+                          onClick={() => handleDayClick(year, month, day)}
+                        >
+                          {day}
+                        </DayCircle>
+                      );
+                    })}
+                  </DaysGrid>
+                </div>
+              );
+            })}
           </MonthsScrollBox>
         </CalendarCard>
 
